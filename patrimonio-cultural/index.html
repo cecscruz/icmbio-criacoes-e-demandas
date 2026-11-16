@@ -5,10 +5,10 @@ const southAmericaBase={"type":"FeatureCollection","features":[{"type":"Feature"
 function init(){dataset.units.sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));dataset.units.forEach(u=>{let o=document.createElement('option');o.value=u.name;o.textContent=u.name;$('uc').appendChild(o)});map=L.map('map',{scrollWheelZoom:true}).setView([-14.5,-53],4);
 // Mapa cartografico completo (ruas, localidades, rios e fronteiras), como no painel principal.
 // O servidor padrao OSM retornou 403 neste projeto; usar Esri World Street Map como alternativa.
-const fundoVetorial=L.geoJSON(southAmericaBase,{interactive:false,style:f=>({color:f.properties.name==='Brazil'?'#8ba6b4':'#c8d4dc',weight:f.properties.name==='Brazil'?1.6:.7,fillColor:f.properties.name==='Brazil'?'#e4eee7':'#f0f3f6',fillOpacity:1})}).addTo(map);
+const fundoVetorial=L.geoJSON(southAmericaBase,{interactive:false,style:f=>({color:f.properties.name==='Brazil'?'#8ba6b4':'#c8d4dc',weight:f.properties.name==='Brazil'?1.6:.7,fillColor:f.properties.name==='Brazil'?'#e4eee7':'#f0f3f6',fillOpacity:1})});
 const tiles=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:18,attribution:'Tiles &copy; Esri &mdash; Source: Esri, HERE, Garmin, OpenStreetMap contributors'});
 let errosTiles=0;
-tiles.on('tileerror',()=>{if(++errosTiles>=3&&map.hasLayer(tiles)){map.removeLayer(tiles);console.warn('Mapa-base Esri indisponivel: exibindo mapa vetorial incorporado.')}});
+tiles.on('tileerror',()=>{if(++errosTiles>=3&&map.hasLayer(tiles)){map.removeLayer(tiles);fundoVetorial.addTo(map);console.warn('Mapa-base Esri indisponivel: exibindo mapa vetorial incorporado.')}});
 tiles.addTo(map);
 // Polígonos das UCs interativos como no Painel de Planos de Manejo.
 const limites=L.geoJSON(ucBoundaries,{style:{color:'#3f6476',weight:1.5,fillColor:'#8ba688',fillOpacity:.3},onEachFeature:(feature,poligono)=>{poligono.on('mouseover',()=>poligono.setStyle({weight:3,fillOpacity:.55}));poligono.on('mouseout',()=>poligono.setStyle({weight:1.5,fillOpacity:.3}));}}).addTo(map);
